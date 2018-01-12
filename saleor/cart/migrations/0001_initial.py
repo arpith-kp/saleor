@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+import uuid
+
 from django.db import models, migrations
 import django.db.models.deletion
 from django.conf import settings
 import django.core.validators
 import satchless.item
-import uuid
 
 
 class Migration(migrations.Migration):
