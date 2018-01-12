@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.utils.timezone import now
 from django.utils.translation import pgettext_lazy
 from django_fsm import FSMField, transition
-from django_prices.models import PriceField
+from django_prices.models import AmountField
 from payments import PaymentStatus, PurchasedItem
 from payments.models import BasePayment
 from prices import FixedDiscount, Price
@@ -56,19 +56,19 @@ class Order(models.Model, ItemSet):
         on_delete=models.PROTECT)
     user_email = models.EmailField(
         blank=True, default='', editable=False)
-    shipping_price = PriceField(
+    shipping_price = AmountField(
         currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=4,
         default=0, editable=False)
     token = models.CharField(max_length=36, unique=True)
-    total_net = PriceField(
+    total_net = AmountField(
         currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
         blank=True, null=True)
-    total_tax = PriceField(
+    total_tax = AmountField(
         currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
         blank=True, null=True)
     voucher = models.ForeignKey(
         Voucher, null=True, related_name='+', on_delete=models.SET_NULL)
-    discount_amount = PriceField(
+    discount_amount = AmountField(
         currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
         blank=True, null=True)
     discount_name = models.CharField(max_length=255, default='', blank=True)

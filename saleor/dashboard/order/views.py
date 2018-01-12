@@ -8,7 +8,6 @@ from django.template.context_processors import csrf
 from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils.translation import pgettext_lazy
-from django_prices.templatetags.prices_i18n import gross
 from payments import PaymentStatus
 from prices import Price
 from satchless.item import InsufficientStock
@@ -26,6 +25,10 @@ from ..views import staff_member_required
 from ...core.utils import get_paginator_items, build_absolute_uri
 from ...order import GroupStatus
 from ...order.models import DeliveryGroup, Order, OrderLine, OrderNote
+
+
+# FIXME: remove stopgap function
+from saleor.prices_stopgap import gross
 
 
 @staff_member_required

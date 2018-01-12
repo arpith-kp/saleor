@@ -1,8 +1,11 @@
 from django import template
-from django_prices.templatetags.prices_i18n import gross
 from prices import Price
 
 register = template.Library()
+
+
+# FIXME: remove stopgap function
+from saleor.prices_stopgap import gross
 
 
 @register.simple_tag

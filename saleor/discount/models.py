@@ -7,13 +7,16 @@ from django.db.models import F, Q
 from django.utils.encoding import smart_text
 from django.utils.translation import pgettext, pgettext_lazy
 from django_countries import countries
-from django_prices.models import PriceField
-from django_prices.templatetags.prices_i18n import net
+from django_prices.models import AmountField
 from prices import FixedDiscount, Price, percentage_discount
 
 from ..cart.utils import (
     get_category_variants_and_prices, get_product_variants_and_prices)
 from . import DiscountValueType, VoucherApplyToProduct, VoucherType
+
+
+# FIXME: remove stopgap function
+from saleor.prices_stopgap import net
 
 
 class NotApplicable(ValueError):
@@ -57,7 +60,7 @@ class Voucher(models.Model):
     category = models.ForeignKey(
         'product.Category', blank=True, null=True, on_delete=models.CASCADE)
     apply_to = models.CharField(max_length=20, blank=True, null=True)
-    limit = PriceField(
+    limit = AmountField(
         max_digits=12, decimal_places=2, null=True, blank=True,
         currency=settings.DEFAULT_CURRENCY)
 

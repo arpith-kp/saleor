@@ -6,7 +6,7 @@ from django.db import models
 from django.db.models import Q
 from django.utils.translation import pgettext_lazy
 from django_countries import countries
-from django_prices.models import PriceField
+from django_prices.models import AmountField
 from prices import PriceRange
 
 ANY_COUNTRY = ''
@@ -74,7 +74,7 @@ class ShippingMethodCountry(models.Model):
     country_code = models.CharField(
         choices=COUNTRY_CODE_CHOICES, max_length=2, blank=True,
         default=ANY_COUNTRY)
-    price = PriceField(
+    price = AmountField(
         currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2)
     shipping_method = models.ForeignKey(
         ShippingMethod, related_name='price_per_country',

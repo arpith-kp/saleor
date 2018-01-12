@@ -10,7 +10,7 @@ from django.urls import reverse
 from django.utils.encoding import smart_text
 from django.utils.text import slugify
 from django.utils.translation import pgettext_lazy
-from django_prices.models import Price, PriceField
+from django_prices.models import Amount, AmountField
 from mptt.managers import TreeManager
 from mptt.models import MPTTModel
 from prices import PriceRange
@@ -93,7 +93,7 @@ class Product(models.Model, ItemRange):
     name = models.CharField(max_length=128)
     description = models.TextField()
     category = models.ForeignKey(Category, related_name='products')
-    price = PriceField(
+    price = AmountField(
         currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2)
     available_on = models.DateField(blank=True, null=True)
     is_published = models.BooleanField(default=True)
@@ -175,7 +175,7 @@ class Product(models.Model, ItemRange):
 class ProductVariant(models.Model, Item):
     sku = models.CharField(max_length=32, unique=True)
     name = models.CharField(max_length=100, blank=True)
-    price_override = PriceField(
+    price_override = AmountField(
         currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
         blank=True, null=True)
     product = models.ForeignKey(
@@ -253,7 +253,7 @@ class ProductVariant(models.Model, Item):
         stock = [
             stock_item for stock_item in self.stock.all()
             if stock_item.quantity_available >= quantity]
-        zero_price = Price(0, currency=settings.DEFAULT_CURRENCY)
+        zero_price = Amount(0, currency=settings.DEFAULT_CURRENCY)
         stock = sorted(
             stock, key=(lambda s: s.cost_price or zero_price), reverse=False)
         if stock:
@@ -290,7 +290,7 @@ class Stock(models.Model):
         validators=[MinValueValidator(0)], default=Decimal(1))
     quantity_allocated = models.IntegerField(
         validators=[MinValueValidator(0)], default=Decimal(0))
-    cost_price = PriceField(
+    cost_price = AmountField(
         currency=settings.DEFAULT_CURRENCY, max_digits=12, decimal_places=2,
         blank=True, null=True)
 
