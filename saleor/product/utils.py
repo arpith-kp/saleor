@@ -6,7 +6,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.db.models import F
 from django.utils.encoding import smart_text
 from django_prices.templatetags import prices_i18n
-from prices import Price, PriceRange
+from prices import Amount, Price, PriceRange
 
 from . import ProductAvailabilityStatus, VariantAvailabilityStatus
 from ..cart.utils import get_cart_from_request, get_or_create_cart_from_request
@@ -228,9 +228,9 @@ def price_as_dict(price):
         return None
     return {'currency': price.currency,
             'gross': price.gross,
-            'grossLocalized': prices_i18n.gross(price),
+            'grossLocalized': prices_i18n.amount(price.gross),
             'net': price.net,
-            'netLocalized': prices_i18n.net(price)}
+            'netLocalized': prices_i18n.amount(price.net)}
 
 
 def price_range_as_dict(price_range):
@@ -309,8 +309,13 @@ def get_variant_availability_status(variant):
         return VariantAvailabilityStatus.AVAILABLE
 
 
+def get_zero_price():
+    zero_amount = Amount(0, currency=settings.DEFAULT_CURRENCY)
+    return Price(net=zero_amount, gross=zero_amount)
+
+
 def get_product_costs_data(product):
-    zero_price = Price(0, 0, currency=settings.DEFAULT_CURRENCY)
+    zero_price = get_zero_price()
     zero_price_range = PriceRange(zero_price, zero_price)
     purchase_costs_range = zero_price_range
     gross_margin = (0, 0)
@@ -358,9 +363,8 @@ def get_variant_costs_data(variant):
 
 
 def get_cost_price(stock):
-    zero_price = Price(0, 0, currency=settings.DEFAULT_CURRENCY)
     if not stock.cost_price:
-        return zero_price
+        return get_zero_price()
     return stock.cost_price
 
 

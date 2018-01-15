@@ -126,8 +126,8 @@ def summary(request, cart):
             'attributes': line.variant.display_variant(attributes),
             'image': first_image,
             'price_per_item': currencyfmt(
-                price_per_item.gross, price_per_item.currency),
-            'line_total': currencyfmt(line_total.gross, line_total.currency),
+                price_per_item.gross.value, price_per_item.currency),
+            'line_total': currencyfmt(line_total.gross.value, line_total.currency),
             'update_url': reverse(
                 'cart:update-line', kwargs={'variant_id': line.variant_id}),
             'variant_url': line.variant.get_absolute_url()}
@@ -137,7 +137,7 @@ def summary(request, cart):
         cart_total = cart.get_total(discounts=request.discounts)
         data = {
             'quantity': cart.quantity,
-            'total': currencyfmt(cart_total.gross, cart_total.currency),
+            'total': currencyfmt(cart_total.gross.value, cart_total.currency),
             'lines': [prepare_line_data(line) for line in cart.lines.all()]}
 
     return render(request, 'cart_dropdown.html', data)

@@ -10,7 +10,7 @@ from django.utils.encoding import smart_str
 from django.utils.timezone import now
 from django_prices.models import AmountField
 from jsonfield import JSONField
-from prices import Price
+from prices import Amount, Price
 from satchless.item import ItemLine, ItemList, partition
 
 from . import CartStatus, logger
@@ -158,7 +158,9 @@ class Cart(models.Model):
             self.get_subtotal(item, **kwargs) for item in self.lines.all()]
         if not subtotals:
             raise AttributeError('Calling get_total() on an empty item set')
-        zero = Price(0, currency=settings.DEFAULT_CURRENCY)
+        zero = Price(
+            net=Amount(0, currency=settings.DEFAULT_CURRENCY),
+            gross=Amount(0, currency=settings.DEFAULT_CURRENCY))
         return sum(subtotals, zero)
 
     def count(self):

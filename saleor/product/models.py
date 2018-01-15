@@ -10,7 +10,7 @@ from django.urls import reverse
 from django.utils.encoding import smart_text
 from django.utils.text import slugify
 from django.utils.translation import pgettext_lazy
-from django_prices.models import Amount, AmountField
+from django_prices.models import Amount, AmountField, Price
 from mptt.managers import TreeManager
 from mptt.models import MPTTModel
 from prices import PriceRange
@@ -199,6 +199,7 @@ class ProductVariant(models.Model, Item):
 
     def get_price_per_item(self, discounts=None, **kwargs):
         price = self.price_override or self.product.price
+        price = Price(net=price, gross=price)
         price = calculate_discounted_price(self.product, price, discounts,
                                            **kwargs)
         return price

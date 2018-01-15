@@ -8,7 +8,7 @@ from django.template.response import TemplateResponse
 from django.urls import reverse
 
 from ..cart.utils import set_cart_cookie
-from ..core.utils import get_paginator_items, serialize_decimal
+from ..core.utils import get_paginator_items, serialize_amount
 from ..core.utils.filters import get_now_sorted_by
 from .filters import ProductFilter, SORT_BY_FIELDS
 from .models import Category
@@ -76,9 +76,9 @@ def product_details(request, slug, product_id, form=None):
          'product_images': product_images,
          'show_variant_picker': show_variant_picker,
          'variant_picker_data': json.dumps(
-             variant_picker_data, default=serialize_decimal),
+             variant_picker_data, default=serialize_amount),
          'json_ld_product_data': json.dumps(
-             json_ld_data, default=serialize_decimal)})
+             json_ld_data, default=serialize_amount)})
 
 
 def product_add_to_cart(request, slug, product_id):

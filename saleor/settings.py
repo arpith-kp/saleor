@@ -252,10 +252,6 @@ DEFAULT_COUNTRY = 'US'
 DEFAULT_CURRENCY = 'USD'
 AVAILABLE_CURRENCIES = [DEFAULT_CURRENCY]
 
-# Items prices entered in dashboard already include tax?
-# This setting affects the tax carculation
-PRICES_INCLUDE_TAX = False
-
 OPENEXCHANGERATES_API_KEY = os.environ.get('OPENEXCHANGERATES_API_KEY')
 
 ACCOUNT_ACTIVATION_DAYS = 3

@@ -3,12 +3,9 @@ import json
 from django import forms
 from django.utils.encoding import smart_text
 from django.utils.translation import pgettext_lazy
+from django_prices.templatetags.prices_i18n import amount
 
 from ..cart.forms import AddToCartForm
-
-
-# FIXME: remove stopgap function
-from saleor.prices_stopgap import net
 
 
 class VariantChoiceField(forms.ModelChoiceField):
@@ -23,7 +20,7 @@ class VariantChoiceField(forms.ModelChoiceField):
             'Variant choice field label',
             '%(variant_label)s - %(price)s') % {
                 'variant_label': variant_label,
-                'price': gross(obj.get_price(discounts=self.discounts))}
+                'price': amount(obj.get_price(discounts=self.discounts)).gross}
         return label
 
     def update_field_data(self, variants, cart):
