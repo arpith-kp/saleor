@@ -93,12 +93,12 @@ def update(request, cart, variant_id):
         updated_line = cart.get_line(form.cart_line.variant)
         if updated_line:
             response['subtotal'] = currencyfmt(
-                updated_line.get_total(discounts=discounts).gross,
+                updated_line.get_total(discounts=discounts).gross.value,
                 updated_line.get_total(discounts=discounts).currency)
         if cart:
             cart_total = cart.get_total(discounts=discounts)
             response['total'] = currencyfmt(
-                cart_total.gross, cart_total.currency)
+                cart_total.gross.value, cart_total.currency)
             local_cart_total = to_local_currency(cart_total, request.currency)
             if local_cart_total:
                 response['localTotal'] = currencyfmt(

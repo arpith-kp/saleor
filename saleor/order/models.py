@@ -12,7 +12,7 @@ from django_fsm import FSMField, transition
 from django_prices.models import AmountField
 from payments import PaymentStatus, PurchasedItem
 from payments.models import BasePayment
-from prices import FixedDiscount, Price
+from prices import Amount, FixedDiscount, Price
 from satchless.item import ItemLine, ItemSet
 
 from . import emails, GroupStatus, OrderStatus
@@ -96,7 +96,7 @@ class Order(models.Model, ItemSet):
             [payment.total for payment in
              self.payments.filter(status=PaymentStatus.CONFIRMED)], Decimal())
         total = self.get_total()
-        return total_paid >= total.gross
+        return total_paid >= total.gross.value
 
     def get_user_current_email(self):
         return self.user.email if self.user else self.user_email
@@ -172,14 +172,13 @@ class Order(models.Model, ItemSet):
     @property
     def total(self):
         if self.total_net is not None:
-            gross = self.total_net.net + self.total_tax.gross
-            return Price(net=self.total_net.net, gross=gross,
-                         currency=settings.DEFAULT_CURRENCY)
+            gross = self.total_net + self.total_tax
+            return Price(net=self.total_net, gross=gross)
 
     @total.setter
     def total(self, price):
-        self.total_net = price
-        self.total_tax = Price(price.tax, currency=price.currency)
+        self.total_net = price.net
+        self.total_tax = price.tax
 
     def get_subtotal_without_voucher(self):
         if self.get_lines():
@@ -275,8 +274,11 @@ class OrderLine(models.Model, ItemLine):
         return self.product_name
 
     def get_price_per_item(self, **kwargs):
-        return Price(net=self.unit_price_net, gross=self.unit_price_gross,
-                     currency=settings.DEFAULT_CURRENCY)
+        amount_net = Amount(
+            self.unit_price_net, currency=settings.DEFAULT_CURRENCY)
+        amount_gross = Amount(
+            self.unit_price_gross, currency=settings.DEFAULT_CURRENCY)
+        return Price(net=amount_net, gross=amount_gross)
 
     def get_quantity(self):
         return self.quantity

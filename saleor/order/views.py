@@ -84,9 +84,9 @@ def start_payment(request, order, variant):
         return redirect('order:payment', token=order.token)
     billing = order.billing_address
     total = order.get_total()
-    defaults = {'total': total.gross,
-                'tax': total.tax, 'currency': total.currency,
-                'delivery': order.shipping_price.gross,
+    defaults = {'total': total.gross.value,
+                'tax': total.tax.value, 'currency': total.currency,
+                'delivery': order.shipping_price.value,
                 'billing_first_name': billing.first_name,
                 'billing_last_name': billing.last_name,
                 'billing_address_1': billing.street_address_1,
