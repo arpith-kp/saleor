@@ -336,11 +336,13 @@ class Payment(BasePayment):
         return lines
 
     def get_total_price(self):
-        net = self.total - self.tax
-        return Price(net, gross=self.total, currency=self.currency)
+        net = Amount(self.total - self.tax, currency=self.currency)
+        gross = Amount(self.total, currency=self.currency)
+        return Price(net, gross)
 
     def get_captured_price(self):
-        return Price(self.captured_amount, currency=self.currency)
+        amount = Amount(self.captured_amount, currency=self.currency)
+        return Price(amount, amount)
 
 
 class OrderHistoryEntry(models.Model):

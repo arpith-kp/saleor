@@ -8,8 +8,9 @@ from django.template.context_processors import csrf
 from django.template.response import TemplateResponse
 from django.urls import reverse
 from django.utils.translation import pgettext_lazy
+from django_prices.templatetags import prices_i18n
 from payments import PaymentStatus
-from prices import Price
+from prices import Amount, Price
 from satchless.item import InsufficientStock
 
 from .filters import OrderFilter
@@ -25,10 +26,6 @@ from ..views import staff_member_required
 from ...core.utils import get_paginator_items, build_absolute_uri
 from ...order import GroupStatus
 from ...order.models import DeliveryGroup, Order, OrderLine, OrderNote
-
-
-# FIXME: remove stopgap function
-from saleor.prices_stopgap import gross
 
 
 @staff_member_required
@@ -57,7 +54,8 @@ def order_details(request, order_pk):
     all_payments = order.payments.exclude(status=PaymentStatus.INPUT)
     payment = order.payments.last()
     groups = list(order)
-    captured = preauthorized = Price(0, currency=order.get_total().currency)
+    zero_amount = Amount(0, currency=order.get_total().currency)
+    captured = preauthorized = Price(zero_amount, zero_amount)
     balance = captured - order.get_total()
     if payment:
         can_capture = (
@@ -118,8 +116,13 @@ def capture_payment(request, order_pk, payment_pk):
         amount = form.cleaned_data['amount']
         msg = pgettext_lazy(
             'Dashboard message related to a payment',
+<<<<<<< HEAD
             'Captured %(amount)s') % {'amount': gross(amount)}
         payment.order.create_history_entry(content=msg, user=request.user)
+=======
+            'Captured %(amount)s') % {'amount': prices_i18n.amount(amount)}
+        payment.order.create_history_entry(comment=msg, user=request.user)
+>>>>>>> 0303c061... Removed prices stopgap, moved more of codebase to new prices
         messages.success(request, msg)
         return redirect('dashboard:order-details', order_pk=order.pk)
     status = 400 if form.errors else 200
@@ -141,8 +144,13 @@ def refund_payment(request, order_pk, payment_pk):
         amount = form.cleaned_data['amount']
         msg = pgettext_lazy(
             'Dashboard message related to a payment',
+<<<<<<< HEAD
             'Refunded %(amount)s') % {'amount': gross(amount)}
         payment.order.create_history_entry(content=msg, user=request.user)
+=======
+            'Refunded %(amount)s') % {'amount': prices_i18n.amount(amount)}
+        payment.order.create_history_entry(comment=msg, user=request.user)
+>>>>>>> 0303c061... Removed prices stopgap, moved more of codebase to new prices
         messages.success(request, msg)
         return redirect('dashboard:order-details', order_pk=order.pk)
     status = 400 if form.errors else 200

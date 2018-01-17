@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404, redirect, reverse
 from django.template.response import TemplateResponse
 from django.utils.translation import npgettext_lazy, pgettext_lazy
 from django.views.decorators.http import require_POST
+from django_prices.templatetags import prices_i18n
 
 from ...core.utils import get_paginator_items
 from ...product.models import (
@@ -19,10 +20,6 @@ from .filters import (
     ProductFilter, ProductAttributeFilter, ProductClassFilter,
     StockLocationFilter)
 from . import forms
-
-
-# FIXME: remove stopgap function
-from saleor.prices_stopgap import gross
 
 
 @staff_member_required
@@ -478,10 +475,23 @@ def variant_details(request, product_pk, variant_pk):
     stock = variant.stock.all()
     images = variant.images.all()
     costs_data = get_variant_costs_data(variant)
+<<<<<<< HEAD
     ctx = {
         'images': images, 'product': product, 'stock': stock,
         'variant': variant, 'costs': costs_data['costs'],
         'margins': costs_data['margins'], 'is_empty': not stock.exists()}
+=======
+    if costs_data:
+        costs = {'min': costs_data['costs'][0],
+                 'max': costs_data['costs'][-1]}
+    else:
+        costs = {}
+
+    ctx = {'images': images, 'product': product, 'stock': stock,
+           'variant': variant, 'costs': costs,
+           'margins': costs_data['margins'],
+           'is_empty': not stock.exists()}
+>>>>>>> 0303c061... Removed prices stopgap, moved more of codebase to new prices
     return TemplateResponse(
         request,
         'dashboard/product/product_variant/detail.html',
@@ -789,7 +799,7 @@ def ajax_available_variants_list(request):
     def get_variant_label(variant, discounts):
         return '%s, %s, %s' % (
             variant.sku, variant.display_product(),
-            gross(variant.get_price_per_item(discounts)))
+            prices_i18n.amount(variant.get_price_per_item(discounts).gross))
 
     available_products = Product.objects.available_products()
     queryset = ProductVariant.objects.filter(
