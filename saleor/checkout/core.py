@@ -105,7 +105,6 @@ class Checkout:
         """
         for partition in self.cart.partition():
             if self.shipping_method and partition.is_shipping_required():
-                # FIXME: self.shipping_method.get_total() should return Price()
                 shipping_amount = self.shipping_method.get_total()
                 shipping_cost = Price(shipping_amount, shipping_amount)
             else:
@@ -305,18 +304,17 @@ class Checkout:
         self._add_to_user_address_book(
             self.billing_address, is_billing=True)
 
-        zero_amount = Amount(0, currency=settings.DEFAULT_CURRENCY)
-        zero = Price(zero_amount, zero_amount)
+        zero = Amount(0, currency=settings.DEFAULT_CURRENCY)
 
         shipping_price = (
             self.shipping_method.get_total() if self.shipping_method
-            else zero) # FIXME: this turns from Price to Amount as checkout progresses
+            else zero)
         order_data = {
             'language_code': get_language(),
             'billing_address': billing_address,
             'shipping_address': shipping_address,
             'tracking_client_id': self.tracking_code,
-            'shipping_price': shipping_price.gross.value,
+            'shipping_price': shipping_price.value,
             'total': self.get_total()}
 
         if self.user.is_authenticated:
