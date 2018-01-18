@@ -183,7 +183,8 @@ class Order(models.Model, ItemSet):
     def get_subtotal_without_voucher(self):
         if self.get_lines():
             return super().get_total()
-        return Price(net=0, currency=settings.DEFAULT_CURRENCY)
+        zero_amount = Amount(0, currency=settings.DEFAULT_CURRENCY)
+        return Price(zero_amount, zero_amount)
 
     def can_cancel(self):
         return self.status == OrderStatus.OPEN

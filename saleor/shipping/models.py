@@ -7,7 +7,7 @@ from django.db.models import Q
 from django.utils.translation import pgettext_lazy
 from django_countries import countries
 from django_prices.models import AmountField
-from prices import PriceRange
+from prices import Price, PriceRange
 
 ANY_COUNTRY = ''
 ANY_COUNTRY_DISPLAY = pgettext_lazy('Country choice', 'Rest of World')
@@ -37,7 +37,7 @@ class ShippingMethod(models.Model):
 
     @property
     def price_range(self):
-        prices = [country.price for country in self.price_per_country.all()]
+        prices = [country.get_total() for country in self.price_per_country.all()]
         if prices:
             return PriceRange(min(prices), max(prices))
 
@@ -91,4 +91,4 @@ class ShippingMethodCountry(models.Model):
             self.shipping_method, self.get_country_code_display())
 
     def get_total(self):
-        return self.price
+        return Price(net=self.price, gross=self.price)

@@ -158,9 +158,8 @@ class Cart(models.Model):
             self.get_subtotal(item, **kwargs) for item in self.lines.all()]
         if not subtotals:
             raise AttributeError('Calling get_total() on an empty item set')
-        zero = Price(
-            net=Amount(0, currency=settings.DEFAULT_CURRENCY),
-            gross=Amount(0, currency=settings.DEFAULT_CURRENCY))
+        zero_amount = Amount(0, currency=settings.DEFAULT_CURRENCY)
+        zero = Price(zero_amount, zero_amount)
         return sum(subtotals, zero)
 
     def count(self):

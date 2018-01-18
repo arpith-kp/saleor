@@ -165,7 +165,7 @@ class Voucher(models.Model):
                     msg % {'country': self.get_apply_to_display()})
             cart_total = checkout.get_subtotal()
             self.validate_limit(cart_total)
-            return self.get_fixed_discount_for(shipping_method.price)
+            return self.get_fixed_discount_for(shipping_method.get_total())
 
         elif self.type in (VoucherType.PRODUCT, VoucherType.CATEGORY):
             if self.type == VoucherType.PRODUCT:
@@ -181,16 +181,16 @@ class Voucher(models.Model):
                     'Voucher not applicable',
                     'This offer is only valid for selected items.')
                 raise NotApplicable(msg)
+            zero_amount = Amout(0, currency=settings.DEFAULT_CURRENCY)
+            zero = Price(zero_amount, zero_amount)
             if self.apply_to == VoucherApplyToProduct.ALL_PRODUCTS:
                 discounts = (
                     self.get_fixed_discount_for(price) for price in prices)
                 discount_total = sum(
-                    (discount.amount for discount in discounts),
-                    Price(0, currency=settings.DEFAULT_CURRENCY))
+                    (discount.amount for discount in discounts), zero)
                 return FixedDiscount(discount_total, smart_text(self))
             else:
-                product_total = sum(
-                    prices, Price(0, currency=settings.DEFAULT_CURRENCY))
+                product_total = sum(prices, zero)
                 return self.get_fixed_discount_for(product_total)
 
         else:
@@ -222,9 +222,15 @@ class Sale(models.Model):
         return self.name
 
     def get_discount(self):
+<<<<<<< HEAD
         if self.type == DiscountValueType.FIXED:
             discount_price = Price(net=self.value,
                                    currency=settings.DEFAULT_CURRENCY)
+=======
+        if self.type == self.FIXED:
+            amount = Amount(self.value, currency=settings.DEFAULT_CURRENCY)
+            discount_price = Price(amount, amount)
+>>>>>>> 7da91781... Replace remaining Price(amount, currency) calls with Amount(), use shipping.get_total() for shipping prices
             return FixedDiscount(amount=discount_price, name=self.name)
         elif self.type == DiscountValueType.PERCENTAGE:
             return percentage_discount(value=self.value, name=self.name)

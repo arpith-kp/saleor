@@ -11,7 +11,7 @@ from django.template.defaultfilters import slugify
 from faker import Factory
 from faker.providers import BaseProvider
 from payments import PaymentStatus
-from prices import Price
+from prices import Amount, Price
 
 from ...discount import VoucherType, DiscountValueType
 from ...discount.models import Sale, Voucher
@@ -248,8 +248,9 @@ def create_products_by_schema(placeholder_dir, how_many, create_images,
 
 class SaleorProvider(BaseProvider):
     def price(self):
-        return Price(fake.pydecimal(2, 2, positive=True),
-                     currency=settings.DEFAULT_CURRENCY)
+        amount = Amount(fake.pydecimal(2, 2, positive=True),
+                        currency=settings.DEFAULT_CURRENCY)
+        return Price(amount, amount)
 
     def delivery_region(self):
         return random.choice(DELIVERY_REGIONS)
