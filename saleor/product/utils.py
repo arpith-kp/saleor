@@ -365,14 +365,15 @@ def get_variant_costs_data(variant):
 def get_cost_price(stock):
     if not stock.cost_price:
         return get_zero_price()
-    return stock.cost_price
+    return stock.get_total()
 
 
 def get_margin_for_variant(stock):
-    if not stock.cost_price:
+    stock_price = stock.get_total()
+    if not stock_price:
         return None
     price = stock.variant.get_price_per_item()
-    margin = price - stock.cost_price
+    margin = price - stock_price
     percent = round((margin.gross / price.gross) * 100, 0)
     return percent
 

@@ -222,15 +222,10 @@ class Sale(models.Model):
         return self.name
 
     def get_discount(self):
-<<<<<<< HEAD
         if self.type == DiscountValueType.FIXED:
-            discount_price = Price(net=self.value,
-                                   currency=settings.DEFAULT_CURRENCY)
-=======
-        if self.type == self.FIXED:
             amount = Amount(self.value, currency=settings.DEFAULT_CURRENCY)
-            discount_price = Price(amount, amount)
->>>>>>> 7da91781... Replace remaining Price(amount, currency) calls with Amount(), use shipping.get_total() for shipping prices
+            discount_price = Amount(
+                self.value, currency=settings.DEFAULT_CURRENCY)
             return FixedDiscount(amount=discount_price, name=self.name)
         elif self.type == DiscountValueType.PERCENTAGE:
             return percentage_discount(value=self.value, name=self.name)

@@ -475,23 +475,16 @@ def variant_details(request, product_pk, variant_pk):
     stock = variant.stock.all()
     images = variant.images.all()
     costs_data = get_variant_costs_data(variant)
-<<<<<<< HEAD
-    ctx = {
-        'images': images, 'product': product, 'stock': stock,
-        'variant': variant, 'costs': costs_data['costs'],
-        'margins': costs_data['margins'], 'is_empty': not stock.exists()}
-=======
     if costs_data:
         costs = {'min': costs_data['costs'][0],
                  'max': costs_data['costs'][-1]}
     else:
         costs = {}
-
-    ctx = {'images': images, 'product': product, 'stock': stock,
-           'variant': variant, 'costs': costs,
-           'margins': costs_data['margins'],
-           'is_empty': not stock.exists()}
->>>>>>> 0303c061... Removed prices stopgap, moved more of codebase to new prices
+        
+    ctx = {
+        'images': images, 'product': product, 'stock': stock,
+        'variant': variant, 'costs': costs,
+        'margins': costs_data['margins'], 'is_empty': not stock.exists()}
     return TemplateResponse(
         request,
         'dashboard/product/product_variant/detail.html',

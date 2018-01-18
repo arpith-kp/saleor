@@ -263,7 +263,7 @@ class ProductVariant(models.Model, Item):
     def get_cost_price(self):
         stock = self.select_stockrecord()
         if stock:
-            return stock.cost_price
+            return stock.get_total()
 
 
 class StockLocation(models.Model):
@@ -305,6 +305,10 @@ class Stock(models.Model):
     @property
     def quantity_available(self):
         return max(self.quantity - self.quantity_allocated, 0)
+
+    def get_total(self):
+        if self.cost_price:
+            return Price(self.cost_price, self.cost_price)
 
 
 class ProductAttribute(models.Model):

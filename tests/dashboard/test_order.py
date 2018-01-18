@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 from django.urls import reverse
 import pytest
 from django_fsm import TransitionNotAllowed
-from prices import Price
+from prices import Amount, Price
 
 from tests.utils import get_redirect_location, get_url_path
 
@@ -669,7 +669,8 @@ def test_process_new_delivery_group_with_discount(
     group.save()
 
     line = group.lines.first()
-    assert line.get_price_per_item() == Price(currency="USD", net=5)
+    assert line.get_price_per_item() == Price(
+        Amount('5', 'USD'), Amount('5', 'USD'))
 
 
 def test_cant_process_cancelled_delivery_group(

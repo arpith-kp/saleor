@@ -116,13 +116,8 @@ def capture_payment(request, order_pk, payment_pk):
         amount = form.cleaned_data['amount']
         msg = pgettext_lazy(
             'Dashboard message related to a payment',
-<<<<<<< HEAD
-            'Captured %(amount)s') % {'amount': gross(amount)}
-        payment.order.create_history_entry(content=msg, user=request.user)
-=======
             'Captured %(amount)s') % {'amount': prices_i18n.amount(amount)}
-        payment.order.create_history_entry(comment=msg, user=request.user)
->>>>>>> 0303c061... Removed prices stopgap, moved more of codebase to new prices
+        payment.order.create_history_entry(content=msg, user=request.user)
         messages.success(request, msg)
         return redirect('dashboard:order-details', order_pk=order.pk)
     status = 400 if form.errors else 200
@@ -145,7 +140,7 @@ def refund_payment(request, order_pk, payment_pk):
         msg = pgettext_lazy(
             'Dashboard message related to a payment',
 <<<<<<< HEAD
-            'Refunded %(amount)s') % {'amount': gross(amount)}
+            'Refunded %(amount)s') % {'amount': prices_i18n.amount(amount)}
         payment.order.create_history_entry(content=msg, user=request.user)
 =======
             'Refunded %(amount)s') % {'amount': prices_i18n.amount(amount)}
