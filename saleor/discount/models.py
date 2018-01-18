@@ -9,7 +9,7 @@ from django.utils.translation import pgettext, pgettext_lazy
 from django_countries import countries
 from django_prices.models import AmountField
 from django_prices.templatetags.prices_i18n import amount
-from prices import FixedDiscount, Price, percentage_discount
+from prices import Amount, FixedDiscount, Price, percentage_discount
 
 from ..cart.utils import (
     get_category_variants_and_prices, get_product_variants_and_prices)
@@ -113,8 +113,8 @@ class Voucher(models.Model):
 
     def get_fixed_discount_for(self, amount):
         if self.discount_value_type == DiscountValueType.FIXED:
-            discount_price = Price(net=self.discount_value,
-                                   currency=settings.DEFAULT_CURRENCY)
+            discount_price = Amount(self.discount_value,
+                                    currency=settings.DEFAULT_CURRENCY)
             discount = FixedDiscount(
                 amount=discount_price, name=smart_text(self))
         elif self.discount_value_type == DiscountValueType.PERCENTAGE:
@@ -122,17 +122,17 @@ class Voucher(models.Model):
                 value=self.discount_value, name=smart_text(self))
             fixed_discount_value = amount - discount.apply(amount)
             discount = FixedDiscount(
-                amount=fixed_discount_value, name=smart_text(self))
+                amount=fixed_discount_value.gross, name=smart_text(self))
         else:
             raise NotImplementedError('Unknown discount value type')
-        if discount.amount > amount:
+        if discount.amount > amount.gross:
             return FixedDiscount(amount, name=smart_text(self))
         else:
             return discount
 
     def validate_limit(self, value):
-        limit = self.limit if self.limit is not None else value
-        if value < limit:
+        limit = self.limit if self.limit is not None else value.gross
+        if value.gross < limit:
             msg = pgettext(
                 'Voucher not applicable',
                 'This offer is only valid for orders over %(amount)s.')
