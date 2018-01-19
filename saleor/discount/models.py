@@ -111,22 +111,22 @@ class Voucher(models.Model):
             choices = dict(VoucherApplyToProduct.CHOICES)
             return choices[self.apply_to]
 
-    def get_fixed_discount_for(self, amount):
+    def get_fixed_discount_for(self, price):
         if self.discount_value_type == DiscountValueType.FIXED:
-            discount_price = Amount(self.discount_value,
-                                    currency=settings.DEFAULT_CURRENCY)
+            discount_amount = Amount(self.discount_value,
+                                     currency=settings.DEFAULT_CURRENCY)
             discount = FixedDiscount(
-                amount=discount_price, name=smart_text(self))
+                amount=discount_amount, name=smart_text(self))
         elif self.discount_value_type == DiscountValueType.PERCENTAGE:
             discount = percentage_discount(
                 value=self.discount_value, name=smart_text(self))
-            fixed_discount_value = amount - discount.apply(amount)
+            fixed_discount_value = price - discount.apply(price)
             discount = FixedDiscount(
                 amount=fixed_discount_value.gross, name=smart_text(self))
         else:
             raise NotImplementedError('Unknown discount value type')
-        if discount.amount > amount.gross:
-            return FixedDiscount(amount, name=smart_text(self))
+        if discount.amount > price.gross:
+            return FixedDiscount(price.gross, name=smart_text(self))
         else:
             return discount
 
@@ -181,16 +181,16 @@ class Voucher(models.Model):
                     'Voucher not applicable',
                     'This offer is only valid for selected items.')
                 raise NotApplicable(msg)
-            zero_amount = Amout(0, currency=settings.DEFAULT_CURRENCY)
-            zero = Price(zero_amount, zero_amount)
+            zero_amount = Amount(0, currency=settings.DEFAULT_CURRENCY)
             if self.apply_to == VoucherApplyToProduct.ALL_PRODUCTS:
                 discounts = (
                     self.get_fixed_discount_for(price) for price in prices)
                 discount_total = sum(
-                    (discount.amount for discount in discounts), zero)
+                    (discount.amount for discount in discounts), zero_amount)
                 return FixedDiscount(discount_total, smart_text(self))
             else:
-                product_total = sum(prices, zero)
+                zero_price = Price(zero_amount, zero_amount)
+                product_total = sum(prices, zero_price)
                 return self.get_fixed_discount_for(product_total)
 
         else:

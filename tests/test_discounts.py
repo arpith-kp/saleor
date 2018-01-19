@@ -26,7 +26,7 @@ def test_valid_voucher_limit(settings, limit, value):
         discount_value_type=DiscountValueType.FIXED,
         discount_value=Amount(10, currency='USD'),
         limit=limit)
-    voucher.validate_limit(value)
+    voucher.validate_limit(Price(value, value))
 
 
 @pytest.mark.integration
@@ -47,10 +47,7 @@ def test_variant_discounts(product_in_stock):
     high_discount.products.add(product_in_stock)
     final_price = variant.get_price_per_item(
         discounts=Sale.objects.all())
-    assert final_price.gross == 0
-    applied_discount = final_price.history.right
-    assert isinstance(applied_discount, FixedDiscount)
-    assert applied_discount.amount.gross == 50
+    assert final_price.gross == Amount(0, 'USD')
 
 
 @pytest.mark.integration
@@ -62,10 +59,7 @@ def test_percentage_discounts(product_in_stock):
         value=50)
     discount.products.add(product_in_stock)
     final_price = variant.get_price_per_item(discounts=[discount])
-    assert final_price.gross == 5
-    applied_discount = final_price.history.right
-    assert isinstance(applied_discount, FractionalDiscount)
-    assert applied_discount.factor == Decimal('0.5')
+    assert final_price.gross == Amount(5, 'USD')
 
 
 @pytest.mark.parametrize(
@@ -79,8 +73,9 @@ def test_value_voucher_checkout_discount(settings, total, discount_value,
         discount_value_type=discount_type,
         discount_value=discount_value,
         limit=Amount(limit, currency='USD') if limit is not None else None)
-    checkout = Mock(
-        get_subtotal=Mock(return_value=Amount(total, currency='USD')))
+    subtotal = Price(
+        Amount(total, currency='USD'), Amount(total, currency='USD'))
+    checkout = Mock(get_subtotal=Mock(return_value=subtotal))
     discount = voucher.get_discount_for_checkout(checkout)
     assert discount.amount == Amount(expected_value, currency='USD')
 
@@ -90,9 +85,9 @@ def test_value_voucher_checkout_discount_not_applicable(settings):
         code='unique', type=VoucherType.VALUE,
         discount_value_type=DiscountValueType.FIXED,
         discount_value=10,
-        limit=100)
-    checkout = Mock(
-        get_subtotal=Mock(return_value=Amount(10, currency='USD')))
+        limit=Amount(100, currency='USD'))
+    subtotal = Price(Amount(10, currency='USD'), Amount(10, currency='USD'))
+    checkout = Mock(get_subtotal=Mock(return_value=subtotal))
     with pytest.raises(NotApplicable) as e:
         voucher.get_discount_for_checkout(checkout)
     assert e.value.limit == Amount(100, currency='USD')
@@ -107,11 +102,15 @@ def test_value_voucher_checkout_discount_not_applicable(settings):
 def test_shipping_voucher_checkout_discount(
         settings, shipping_cost, shipping_country_code, discount_value,
         discount_type, apply_to, expected_value):
+    subtotal = Price(Amount(100, currency='USD'), Amount(100, currency='USD'))
+    shipping_total = Price(Amount(shipping_cost, currency='USD'),
+                           Amount(shipping_cost, currency='USD'))
     checkout = Mock(
-        get_subtotal=Mock(return_value=Amount(100, currency='USD')),
+        get_subtotal=Mock(return_value=subtotal),
         is_shipping_required=True, shipping_method=Mock(
             price=Amount(shipping_cost, currency='USD'),
-            country_code=shipping_country_code))
+            country_code=shipping_country_code,
+            get_total=Mock(return_value=shipping_total)))
     voucher = Voucher(
         code='unique', type=VoucherType.SHIPPING,
         discount_value_type=discount_type,
@@ -142,7 +141,7 @@ def test_shipping_voucher_checkout_discountnot_applicable(
         discount_type, apply_to, limit, subtotal, error_msg):
     checkout = Mock(is_shipping_required=is_shipping_required,
                     shipping_method=shipping_method,
-                    get_subtotal=Mock(return_value=subtotal))
+                    get_subtotal=Mock(return_value=Price(subtotal, subtotal)))
     voucher = Voucher(
         code='unique', type=VoucherType.SHIPPING,
         discount_value_type=discount_type,
@@ -279,7 +278,8 @@ def test_products_voucher_checkout_discount_not(settings, monkeypatch, prices,
     monkeypatch.setattr(
         'saleor.discount.models.get_product_variants_and_prices',
         lambda cart, product: (
-            (None, Amount(p, currency='USD')) for p in prices))
+            (None, Price(Amount(p, currency='USD'),
+                         Amount(p, currency='USD'))) for p in prices))
     voucher = Voucher(
         code='unique', type=VoucherType.PRODUCT,
         discount_value_type=discount_type,
@@ -305,8 +305,8 @@ def test_sale_applies_to_correct_products(product_class, default_category):
         name='Test sale', value=5, type=DiscountValueType.FIXED)
     sale.products.add(product)
     assert product2 not in sale.products.all()
-    assert sale.modifier_for_product(variant.product).amount == Price(
-        net=Amount(5, currency='USD'), gross=Amount(5, currency='USD'))
+    discount_amount = sale.modifier_for_product(variant.product).amount
+    assert discount_amount == Amount(5, currency='USD')
     with pytest.raises(NotApplicable):
         sale.modifier_for_product(sec_variant.product)
 

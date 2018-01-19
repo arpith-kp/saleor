@@ -22,11 +22,12 @@ def test_total_property_empty_value():
 
 
 def test_total_setter():
-    price = Price(net=10, gross=20, currency='USD')
+    price = Price(net=Amount(10, currency='USD'),
+                  gross=Amount(20, currency='USD'))
     order = models.Order()
     order.total = price
-    assert order.total_net.net == 10
-    assert order.total_tax.net == 10
+    assert order.total_net == Amount(10, currency='USD')
+    assert order.total_tax == Amount(10, currency='USD')
 
 
 def test_add_variant_to_delivery_group_adds_line_for_new_variant(

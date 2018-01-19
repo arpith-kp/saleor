@@ -224,7 +224,7 @@ def get_product_attributes_data(product):
 
 
 def price_as_dict(price):
-    if not price:
+    if price is None:
         return None
     return {'currency': price.currency,
             'gross': price.gross,
@@ -370,7 +370,7 @@ def get_cost_price(stock):
 
 def get_margin_for_variant(stock):
     stock_price = stock.get_total()
-    if not stock_price:
+    if stock_price is None:
         return None
     price = stock.variant.get_price_per_item()
     margin = price - stock_price

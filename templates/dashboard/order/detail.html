@@ -166,7 +166,7 @@
                   {% trans "Preauthorized amount" context "Order summary card header" %}
                 </td>
                 <td class="right-align">
-                  {% if preauthorized %}
+                  {% if preauthorized.gross %}
                     {{ preauthorized.gross|amount:'html' }}
                   {% else %}
                     {% trans "N/A" context "Preauthorized amount not available" %}

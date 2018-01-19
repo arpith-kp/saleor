@@ -246,15 +246,9 @@ def product_in_stock(product_class, default_category):
     attributes = {smart_text(product_attr.pk): smart_text(attr_value.pk)}
 
     product = Product.objects.create(
-<<<<<<< HEAD
-        name='Test product', price=Decimal('10.00'),
+        name='Test product', price=Amount('10.00', currency='USD'),
         product_class=product_class, attributes=attributes,
         category=default_category)
-=======
-        name='Test product', price=Amount('10.00', currency='USD'),
-        product_class=product_class, attributes=attributes)
-    product.categories.add(default_category)
->>>>>>> 4d9f06f1... WIP tests suite update
 
     variant_attr = product_class.variant_attributes.first()
     variant_attr_value = variant_attr.values.first()
@@ -307,7 +301,9 @@ def product_list(product_class, default_category):
 def order_list(admin_user, billing_address):
     data = {
         'billing_address': billing_address, 'user': admin_user,
-        'user_email': admin_user.email, 'total': Amount(123, currency='USD')}
+        'user_email': admin_user.email,
+        'total_net': Amount(123, currency='USD'),
+        'total_tax': Amount(0, currency='USD')}
     order = Order.objects.create(**data)
     order1 = Order.objects.create(**data)
     order2 = Order.objects.create(**data)
@@ -346,7 +342,7 @@ def unavailable_product(product_class, default_category):
 
 
 @pytest.fixture
-def product_with_images(ąproduct_class, default_category):
+def product_with_images(product_class, default_category):
     product = Product.objects.create(
         name='Test product', price=Amount('10.00', currency='USD'),
         product_class=product_class, category=default_category)

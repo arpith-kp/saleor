@@ -229,11 +229,17 @@ class PriceType(graphene.ObjectType):
     net = graphene.Float()
     net_localized = graphene.String()
 
+    def resolve_gross(self, info):
+        return self.gross.value
+
     def resolve_gross_localized(self, info):
-        return prices_i18n.gross(self)
+        return prices_i18n.amount(self.gross)
+
+    def resolve_net(self, info):
+        return self.net.value
 
     def resolve_net_localized(self, info):
-        return prices_i18n.net(self)
+        return prices_i18n.amount(self.net)
 
 
 class PriceRangeType(graphene.ObjectType):

@@ -4,7 +4,7 @@ from django.conf import settings
 from django.db.models import F
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.translation import pgettext_lazy
-from prices import Price
+from prices import Amount, Price
 from satchless.item import InsufficientStock
 
 from ..product.utils import allocate_stock, deallocate_stock
@@ -42,11 +42,12 @@ def recalculate_order(order):
     prices = [
         group.get_total() for group in order
         if group.status != GroupStatus.CANCELLED]
-    total_net = sum(p.net for p in prices)
-    total_gross = sum(p.gross for p in prices)
+    total_net = sum(p.net.value for p in prices)
+    total_gross = sum(p.gross.value for p in prices)
     total = Price(
-        net=total_net, gross=total_gross, currency=settings.DEFAULT_CURRENCY)
-    total += order.shipping_price
+        net=Amount(total_net, currency=settings.DEFAULT_CURRENCY),
+        gross=Amount(total_gross, currency=settings.DEFAULT_CURRENCY))
+    total += Price(order.shipping_price, order.shipping_price)
     order.total = total
     order.save()
 

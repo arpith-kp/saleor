@@ -99,10 +99,11 @@ def update(request, cart, variant_id):
             cart_total = cart.get_total(discounts=discounts)
             response['total'] = currencyfmt(
                 cart_total.gross.value, cart_total.currency)
+            # FIXME: Currency exchange doesn't work with new prices package
             local_cart_total = to_local_currency(cart_total, request.currency)
-            if local_cart_total:
+            if local_cart_total is not None:
                 response['localTotal'] = currencyfmt(
-                    local_cart_total.gross, local_cart_total.currency)
+                    local_cart_total.gross.value, local_cart_total.currency)
         status = 200
     elif request.POST is not None:
         response = {'error': form.errors}
