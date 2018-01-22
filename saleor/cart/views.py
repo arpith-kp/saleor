@@ -128,7 +128,8 @@ def summary(request, cart):
             'image': first_image,
             'price_per_item': currencyfmt(
                 price_per_item.gross.value, price_per_item.currency),
-            'line_total': currencyfmt(line_total.gross.value, line_total.currency),
+            'line_total': currencyfmt(
+                line_total.gross.value, line_total.currency),
             'update_url': reverse(
                 'cart:update-line', kwargs={'variant_id': line.variant_id}),
             'variant_url': line.variant.get_absolute_url()}

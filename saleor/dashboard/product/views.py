@@ -480,7 +480,6 @@ def variant_details(request, product_pk, variant_pk):
                  'max': costs_data['costs'][-1]}
     else:
         costs = {}
-        
     ctx = {
         'images': images, 'product': product, 'stock': stock,
         'variant': variant, 'costs': costs,
