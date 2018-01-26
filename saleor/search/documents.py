@@ -30,11 +30,11 @@ class ProductDocument(DocType):
         fields = ['name', 'description', 'is_published']
 
 
-users = Index('users')
-users.settings(number_of_shards=1, number_of_replicas=0)
+#users = Index('users')
+#users.settings(number_of_shards=1, number_of_replicas=0)
 
 
-@users.doc_type
+#@users.doc_type
 class UserDocument(DocType):
     user = fields.StringField(analyzer=email_analyzer)
     first_name = fields.StringField()
