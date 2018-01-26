@@ -270,8 +270,14 @@ PAYMENT_HOST = get_host
 
 PAYMENT_MODEL = 'order.Payment'
 
+#PAYMENT_VARIANTS = {
+#    'default': ('payments.dummy.DummyProvider', {})}
 PAYMENT_VARIANTS = {
-    'default': ('payments.dummy.DummyProvider', {})}
+    'braintree': ('payments.braintree.BraintreeProvider', {
+        'merchant_id': 'kfzg6znn3jjn6kp5',
+        'public_key': '3cmyxt5b5hxkhn7k',
+        'private_key': 'bf30a1218ccfbc938473d3cc5216d5d7',
+        'sandbox': True})}
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
