@@ -79,9 +79,11 @@
               {% csrf_token %}
               {{ payment_form }}
               {% block form_submit %}
-                <button type="submit" class="btn primary">
-                  {% trans "Proceed to payment" context "Payment details primary action" %}
-                </button>
+                  <a href="https://test.instamojo.com/@kmvdistributors/" rel="im-checkout" data-behaviour="remote" data-style="flat" data-text="PROCEED TO PAYMENT"></a>
+                  <script src="https://js.instamojo.com/v1/button.js"></script>
+                <!--<button type="submit" class="btn primary">-->
+                  <!--{% trans "Proceed to payment" context "Payment details primary action" %}-->
+                <!--</button>-->
               {% endblock %}
             </form>
           {% else %}
