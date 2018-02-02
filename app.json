@@ -60,9 +60,6 @@
       "required": false
     }
   },
-  "scripts": {
-    "postdeploy": "./postdeploy.sh"
-  },
   "addons": [
     "heroku-postgresql:hobby-dev",
     "heroku-redis:hobby-dev",
