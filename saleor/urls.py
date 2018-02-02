@@ -17,6 +17,7 @@ from .product.urls import urlpatterns as product_urls
 from .registration.urls import urlpatterns as registration_urls
 from .search.urls import urlpatterns as search_urls
 from .userprofile.urls import urlpatterns as userprofile_urls
+from .payments.instamojo.urls import urlpatterns as payments_urls
 
 urlpatterns = [
     url(r'^', include(core_urls)),
@@ -39,6 +40,7 @@ urlpatterns = [
     url(r'^sitemap\.xml$', sitemap, {'sitemaps': sitemaps},
         name='django.contrib.sitemaps.views.sitemap'),
     url(r'', include('payments.urls')),
+    url(r'^payment/', include((payments_urls, 'payment'), namespace='payment')),
     url('', include('social_django.urls', namespace='social')),
 ]
 

@@ -29,6 +29,21 @@
       "description": "A secret key for verifying the integrity of signed cookies.",
       "generator": "secret"
     },
+    "INSTAMOJO_API_KEY" : {
+      "description": "Instamojo API key",
+      "value": "",
+      "required": false
+    },
+    "INSTAMOJO_AUTH_TOKEN" : {
+      "description": "Instamojo AUTH token",
+      "value": "",
+      "required": false
+    },
+    "INSTAMOJO_SANDBOX" : {
+      "description": "Instamojo Sandbox credentials ",
+      "value": false,
+      "required": false
+    },
     "AWS_MEDIA_BUCKET_NAME": {
       "description": "If you intend to upload your own product images, we strongly recommend configure S3.",
       "value": "",

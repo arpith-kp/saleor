@@ -248,7 +248,7 @@ AUTH_USER_MODEL = 'userprofile.User'
 
 LOGIN_URL = '/account/login/'
 
-DEFAULT_COUNTRY = 'INDIA'
+DEFAULT_COUNTRY = 'IN'
 DEFAULT_CURRENCY = 'INR'
 AVAILABLE_CURRENCIES = [DEFAULT_CURRENCY]
 
@@ -272,18 +272,19 @@ PAYMENT_MODEL = 'order.Payment'
 
 #PAYMENT_VARIANTS = {
 #    'default': ('payments.dummy.DummyProvider', {})}
+
 PAYMENT_VARIANTS = {
-    'braintree': ('payments.braintree.BraintreeProvider', {
-        'merchant_id': 'kfzg6znn3jjn6kp5',
-        'public_key': '3cmyxt5b5hxkhn7k',
-        'private_key': 'bf30a1218ccfbc938473d3cc5216d5d7',
-        'sandbox': True})}
+    'instamojo': ('saleor.payments.instamojo.InstaMojoProvider', {
+        'public_key': os.environ.get('INSTAMOJO_API_KEY'),
+        'private_auth_token': os.environ.get('INSTAMOJO_AUTH_TOKEN'),
+        'sandbox': os.environ.get('INSTAMOJO_SANDBOX'),})}
+
+CHECKOUT_PAYMENT_CHOICES = [
+    ('instamojo', 'Instamojo provider')]
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 
-CHECKOUT_PAYMENT_CHOICES = [
-    ('braintree', 'Braintree provider')]
 
 MESSAGE_TAGS = {
     messages.ERROR: 'danger'}
